@@ -9,6 +9,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends WearableActivity implements SensorEventListener
@@ -20,6 +21,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     boolean isOn;
     private View view;
     Vibrator vibrator;
+    int limitHeartRate = 170;
+    Button plusButton;
+    Button minusButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +31,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         setContentView(R.layout.activity_main);
 
         mTextView = findViewById(R.id.text);
+        plusButton = findViewById(R.id.plusButton);
+        minusButton = findViewById(R.id.minusButton);
+
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         assert sensorManager != null;
             heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-
+        mTextView.setText(String.format(limitHeartRate+"" ));
         // Enables Always-on
         setAmbientEnabled();
     }
@@ -42,13 +49,17 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         if(isOn)
         {
-            mTextView.setText("Отключено");
+            mTextView.setText(String.format(limitHeartRate+"" ));
+            plusButton.setVisibility(View.VISIBLE);
+            minusButton.setVisibility(View.VISIBLE);
             sensorManager.unregisterListener(this);
             isOn=false;
         }
         else
         {
             mTextView.setText("Идет измерение...");
+            plusButton.setVisibility(View.INVISIBLE);
+            minusButton.setVisibility(View.INVISIBLE);
             sensorManager.registerListener( this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
             isOn=true;
         }
@@ -58,12 +69,23 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     {
         float rate = event.values[0];
         mTextView.setText(String.format("%.0f",rate ));
-        if(rate>170)
+        if(rate>limitHeartRate)
             vibrator.vibrate(VibrationEffect.createOneShot(100,10));
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void MinusClick(View view)
+    {
+        limitHeartRate-=5;
+        mTextView.setText(String.format(limitHeartRate+"" ));
+    }
+
+    public void PlusClick(View view) {
+        limitHeartRate+=5;
+        mTextView.setText(String.format(limitHeartRate+"" ));
     }
 }
