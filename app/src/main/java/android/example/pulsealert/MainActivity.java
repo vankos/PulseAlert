@@ -1,5 +1,6 @@
 package android.example.pulsealert;
 
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,9 +22,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     boolean isOn;
     private View view;
     Vibrator vibrator;
-    int limitHeartRate = 170;
+    int limitHeartRate;
     Button plusButton;
     Button minusButton;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +40,18 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         assert sensorManager != null;
             heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        mTextView.setText(String.format(limitHeartRate+"" ));
+
+        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        editor = sharedPref.edit();
+        limitHeartRate = sharedPref.getInt("LimitValue", 170);
+        mTextView.setText(limitHeartRate+"");
+
         // Enables Always-on
         setAmbientEnabled();
     }
 
     public void ButtonClick(View view)
     {
-
-
         if(isOn)
         {
             mTextView.setText(String.format(limitHeartRate+"" ));
@@ -65,6 +70,13 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
+    private void DisplayAndSave(int limit)
+    {
+        mTextView.setText(limit+"");
+        editor.putInt("LimitValue",limit);
+        editor.apply();
+    }
+
     public void onSensorChanged(SensorEvent event)
     {
         float rate = event.values[0];
@@ -81,11 +93,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public void MinusClick(View view)
     {
         limitHeartRate-=5;
-        mTextView.setText(String.format(limitHeartRate+"" ));
+        DisplayAndSave(limitHeartRate);
     }
 
     public void PlusClick(View view) {
         limitHeartRate+=5;
-        mTextView.setText(String.format(limitHeartRate+"" ));
+        DisplayAndSave(limitHeartRate);
     }
 }
