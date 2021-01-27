@@ -49,8 +49,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mTextView.setText(limitHeartRate+"");
 
         defaultTextSize=mTextView.getTextSize();
-
-
+        
         // Enables Always-on
         setAmbientEnabled();
     }
