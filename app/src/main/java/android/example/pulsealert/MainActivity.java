@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private View view;
     Vibrator vibrator;
     int limitHeartRate;
+    float defaultTextSize;
     Button plusButton;
     Button minusButton;
     SharedPreferences.Editor editor;
@@ -46,14 +48,20 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         limitHeartRate = sharedPref.getInt("LimitValue", 170);
         mTextView.setText(limitHeartRate+"");
 
+        defaultTextSize=mTextView.getTextSize();
+
+
         // Enables Always-on
         setAmbientEnabled();
     }
 
     public void ButtonClick(View view)
     {
+
+
         if(isOn)
         {
+            mTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,defaultTextSize);
             mTextView.setText(String.format(limitHeartRate+"" ));
             plusButton.setVisibility(View.VISIBLE);
             minusButton.setVisibility(View.VISIBLE);
@@ -62,7 +70,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
         else
         {
-            mTextView.setText("Идет измерение...");
+            mTextView.setTextSize(45);
+            mTextView.setText("...");
             plusButton.setVisibility(View.INVISIBLE);
             minusButton.setVisibility(View.INVISIBLE);
             sensorManager.registerListener( this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
